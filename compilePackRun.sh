@@ -1,5 +1,10 @@
 #!/bin/sh
 
+# create bin/ directory if not exists
+if [ ! -d bin ]; then
+	mkdir bin
+fi
+
 # translate to bytecode
 # compile *.java files in src/ to *.class files in bin/
 javac -d bin src/main/java/*.java
