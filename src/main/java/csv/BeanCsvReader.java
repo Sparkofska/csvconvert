@@ -17,7 +17,7 @@ import java.util.List;
  */
 public abstract class BeanCsvReader<T>
 {
-	private PureCsvReader base;
+	protected PureCsvReader base;
 
 	private ArrayList<T> beans;
 
@@ -25,23 +25,24 @@ public abstract class BeanCsvReader<T>
 
 	public BeanCsvReader(File csvFile) throws IOException
 	{
-		this(csvFile, "ISO8859_1");
+		this(csvFile, CsvParams.getDefaultCsvParams());
 	}
 
-	public BeanCsvReader(File csvFile, String charset) throws IOException
+	public BeanCsvReader(File csvFile, CsvParams csvParams) throws IOException
 	{
-		this.base = getPureCsvReader(new BufferedReader(new InputStreamReader(new FileInputStream(csvFile), charset)));
+		this.base = getPureCsvReader(
+				new BufferedReader(new InputStreamReader(new FileInputStream(csvFile), csvParams.encoding)), csvParams);
 	}
 
 	public BeanCsvReader(Reader reader)
 	{
-		this.base = getPureCsvReader(reader);
+		this.base = getPureCsvReader(reader, CsvParams.getDefaultCsvParams());
 	}
 
 	public List<T> getBeans() throws IOException
 	{
 		if (this.stateAlreadyRead)
-			throw new IllegalStateException("Die Datei wurde bereits gelesen.");
+			throw new IllegalStateException("File " + base.getFileName() + " was already read.");
 
 		base.read();
 
@@ -50,9 +51,9 @@ public abstract class BeanCsvReader<T>
 		return getBeanList();
 	}
 
-	protected PureCsvReader getPureCsvReader(Reader reader)
+	protected PureCsvReader getPureCsvReader(Reader reader, CsvParams csvParams)
 	{
-		return new PureCsvReader(reader)
+		return new PureCsvReader(reader, csvParams)
 		{
 			@Override
 			protected void onLine(int index, List<String> list)

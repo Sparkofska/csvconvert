@@ -13,24 +13,32 @@ public abstract class PureCsvReader
 {
 	private CsvParams csvParams = CsvParams.getDefaultCsvParams();
 	private BufferedReader reader;
+	private File file; // store for Exception-Messages
 
 	public PureCsvReader(File csvFile) throws IOException
 	{
-		// TODO get charset from csvParams
-		this(csvFile, "ISO8859_1");
+		this(csvFile, CsvParams.getDefaultCsvParams());
 	}
 
-	public PureCsvReader(File csvFile, String charset) throws IOException
+	public PureCsvReader(File csvFile, CsvParams csvParams) throws IOException
 	{
-		reader = new BufferedReader(new InputStreamReader(new FileInputStream(csvFile), charset));
+		reader = new BufferedReader(new InputStreamReader(new FileInputStream(csvFile), csvParams.encoding));
+		setCsvParams(csvParams);
+		this.file = csvFile;
 	}
 
 	public PureCsvReader(Reader reader)
+	{
+		this(reader, CsvParams.getDefaultCsvParams());
+	}
+
+	public PureCsvReader(Reader reader, CsvParams csvParams)
 	{
 		if (reader instanceof BufferedReader)
 			this.reader = (BufferedReader) reader;
 		else
 			this.reader = new BufferedReader(reader);
+		setCsvParams(csvParams);
 	}
 
 	/**
@@ -54,7 +62,7 @@ public abstract class PureCsvReader
 		String headers;
 		if ((headers = reader.readLine()) == null)
 		{
-			throw new IllformedCsvException("Empty file was given.");
+			throw new IllformedCsvException("Empty csv-file was given: " + getFileName());
 		}
 		else
 		{
@@ -133,8 +141,8 @@ public abstract class PureCsvReader
 		}
 
 		if (inEscapeSequence)
-			throw new IllformedConfigFileException(
-					"Improper number of '" + csvParams.escapeChar + "'s in line " + lineCounter);
+			throw new IllformedConfigFileException("Improper number of '" + csvParams.escapeChar + "'s in line "
+					+ lineCounter + " in " + getFileName());
 
 		return result;
 	}
@@ -149,4 +157,10 @@ public abstract class PureCsvReader
 		this.csvParams = csvParams;
 	}
 
+	public String getFileName()
+	{
+		if (this.file != null)
+			return this.file.getAbsolutePath();
+		return "no-file-given";
+	}
 }

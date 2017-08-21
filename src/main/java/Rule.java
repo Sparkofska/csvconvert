@@ -1,7 +1,6 @@
 package main.java;
 
 /**
- * TODO write doc
  * 
  * @author jonas
  *

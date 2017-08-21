@@ -12,11 +12,10 @@ public class Main
 {
 	public static void main(String... args)
 	{
+		// parse input paths
+		CsvTransformArguments arguments = parseArgs(args);
 		try
 		{
-			// parse input paths
-			CsvTransformArguments arguments = parseArgs(args);
-
 			// parse config-file
 			ConfigReader configreader = new ConfigReader(new File(arguments.pathConfigFile));
 			configreader.parse();
@@ -24,17 +23,9 @@ public class Main
 			CsvParams ouputFileParams = configreader.getOutputFileParams();
 			List<Rule> rules = configreader.getRules();
 
-			/*
-			 * debugPrintRules(rules); debugPrint(inputFileParams,
-			 * "inputFileParams"); debugPrint(ouputFileParams,
-			 * "outputFileParams");
-			 */
-
 			// read input file into beans
-			MapCsvReader csvreader = new MapCsvReader(new File(arguments.pathInputFile));
-			csvreader.setCsvParams(inputFileParams);
+			MapCsvReader csvreader = new MapCsvReader(new File(arguments.pathInputFile), inputFileParams);
 			List<Map<String, Object>> inputCsvData = csvreader.getBeans();
-//			debugPrint(inputCsvData);
 
 			// write beans to outputfile
 			TransformCsvWriter writer = new TransformCsvWriter(new File(arguments.pathOutputFile), rules,
@@ -42,57 +33,25 @@ public class Main
 			writer.emit(inputCsvData);
 			writer.close();
 
-			System.out.println("terminated successfully.");
+			System.out.println("Ouput successfully written to " + arguments.pathOutputFile + ".");
 		}
 		catch (Exception e)
 		{
 			// catch any Exception and present it to user in a proper way
-			// TODO
-			System.out.println("TODO Exception was catched");
-			e.printStackTrace();
-		}
-	}
-
-	/**
-	 * TODO remove this debug method
-	 */
-	private static void debugPrintRules(List<Rule> rules)
-	{
-		System.out.println("rules:  ---  ");
-		for (Rule r : rules)
-		{
-			System.out.println(r);
-		}
-		System.out.println("  ---  ");
-	}
-
-	private static void debugPrint(CsvParams p, String msg)
-	{
-		if (msg != null)
-			System.out.println(msg);
-
-		System.out.println(p.toString());
-	}
-
-	/**
-	 * TODO remove this debug method
-	 */
-	private static void debugPrint(List<Map<String, Object>> inputCsvData)
-	{
-		for (Map<String, Object> map : inputCsvData)
-		{
-			for (String key : map.keySet())
-			{
-				System.out.println(key + "\t -> " + map.get(key));
-			}
-			System.out.println(" --- ");
+			String exName = e.getClass().getName();
+			System.out.println(exName + ": " + e.getMessage());
+			// e.printStackTrace();
 		}
 	}
 
 	private static CsvTransformArguments parseArgs(String... args)
 	{
 		if (args.length != 3)
-			error(ErrorCode.ERROR_WRONG_NUMBER_ARGUMENTS, "Must be exactly 3, but were " + args.length + ".");
+		{
+			printHelp();
+			throw new IllegalArgumentException(
+					"Number of program Arguments must be exactly 3, but was " + args.length + ".");
+		}
 
 		CsvTransformArguments bean = new CsvTransformArguments();
 		bean.pathInputFile = args[0];
@@ -105,19 +64,6 @@ public class Main
 		return bean;
 	}
 
-	public static void error(ErrorCode errorCode)
-	{
-		error(errorCode, "");
-	}
-
-	public static void error(ErrorCode errorCode, String additionalMsg)
-	{
-		System.err.println(errorCode.getMsg());
-		System.err.println(additionalMsg);
-		printHelp();
-		System.exit(errorCode.getN());
-	}
-
 	private static void printHelp()
 	{
 		System.out.println("");
@@ -125,8 +71,10 @@ public class Main
 		System.out.println("---------------------");
 		System.out.println("");
 		System.out.println("Call this programm like:\n\n" + "java -jar csvtool.jar input.csv output.csv config.txt\n\n"
-		// TODO
-				+ "input.csv  : TODO \n" + "output.csv : TODO \n" + "config.txt : TODO \n" + "");
+				+ "input.csv  :\n A csv file containing all the data that should be transformed. This file will remain the same after execution. \n"
+				+ "output.csv :\n This file (is created if not exists) will be overwritten by the program. All the transformed data will be placed here after execution. \n"
+				+ "config.txt :\n A file with a special syntax that defines all the transformation rules. \n\n"
+				+ "For further information and config.txt-syntax see https://github.com/Sparkofska/csvconvert");
 
 		System.out.println("");
 	}

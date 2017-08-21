@@ -11,14 +11,14 @@ public class MapCsvReader extends BeanCsvReader<Map<String, Object>>
 {
 	private List<String> headers;
 
-	public MapCsvReader(File csvFile, String charset) throws IOException
-	{
-		super(csvFile, charset);
-	}
-
 	public MapCsvReader(File csvFile) throws IOException
 	{
 		super(csvFile);
+	}
+
+	public MapCsvReader(File csvFile, CsvParams csvParams) throws IOException
+	{
+		super(csvFile, csvParams);
 	}
 
 	@Override
@@ -27,8 +27,7 @@ public class MapCsvReader extends BeanCsvReader<Map<String, Object>>
 		if (list.size() != headers.size())
 		{
 			throw new IllformedCsvException("Line " + index + " has " + list.size() + " columns, but header has "
-					+ headers.size() + " columns.");
-			// TODO would be interesting here to know which file is illformed.
+					+ headers.size() + " columns in " + base.getFileName());
 		}
 
 		Map<String, Object> map = new HashMap<String, Object>(list.size());
@@ -45,9 +44,9 @@ public class MapCsvReader extends BeanCsvReader<Map<String, Object>>
 	}
 
 	@Override
-	protected PureCsvReader getPureCsvReader(Reader reader)
+	protected PureCsvReader getPureCsvReader(Reader reader, CsvParams csvParams)
 	{
-		return new PureCsvReader(reader)
+		return new PureCsvReader(reader, csvParams)
 		{
 			@Override
 			protected void onHeaders(List<String> list)

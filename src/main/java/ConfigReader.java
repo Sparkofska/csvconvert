@@ -105,7 +105,8 @@ public class ConfigReader
 				if (ch == equalsChar || ch == ruleChar)
 				{
 					if (splitCharacter != null)
-						throw new IllformedConfigFileException("Too many '" + ch + "'s in line " + lineCounter);
+						throw new IllformedConfigFileException(
+								"Too many '" + ch + "'s in line " + lineCounter + " in " + getFileName());
 					splitCharacter = ch;
 
 					value1 = curVal.toString();
@@ -115,7 +116,8 @@ public class ConfigReader
 				if (ch == defvalChar)
 				{
 					if (value2 != null)
-						throw new IllformedConfigFileException("Too many '" + defvalChar + "'s in line " + lineCounter);
+						throw new IllformedConfigFileException("Too many '" + defvalChar + "'s in line " + lineCounter
+								+ " in " + getFileName());
 					value2 = curVal.toString();
 					curVal = new StringBuffer();
 					continue;
@@ -125,7 +127,8 @@ public class ConfigReader
 		}
 
 		if (inEscapeSequence)
-			throw new IllformedConfigFileException("Improper number of '" + escapeChar + "'s in line " + lineCounter);
+			throw new IllformedConfigFileException("Improper number of '" + escapeChar + "'s in line " + lineCounter
+					+ " in " + getFileName());
 
 		if (value2 == null)
 			value2 = curVal.toString();
@@ -134,7 +137,8 @@ public class ConfigReader
 
 		if (value1 == null || value2 == null)
 			throw new IllformedConfigFileException("Syntax-Error in line " + lineCounter + ". Maybe no '" + equalsChar
-					+ "' or '" + ruleChar + "' found or problem with the escape character '" + escapeChar + "'.");
+					+ "' or '" + ruleChar + "' found or problem with the escape character '" + escapeChar + "'. File: "
+					+ getFileName());
 
 		value1 = stripWhitespace(value1);
 		value2 = stripWhitespace(value2);
@@ -149,9 +153,16 @@ public class ConfigReader
 			addRule(value1, value2, value3);
 		}
 		else
-			throw new IllformedConfigFileException(
-					"No '" + equalsChar + "' or '" + ruleChar + "' in line" + lineCounter);
+			throw new IllformedConfigFileException("No '" + equalsChar + "' or '" + ruleChar + "' in line" + lineCounter
+					+ " in " + getFileName());
 
+	}
+
+	private String getFileName()
+	{
+		if(this.file != null)
+			return file.getAbsolutePath();
+		return "no-file-given";
 	}
 
 	private void addRule(String originColumn, String destinationColumn, String defaultValue)
@@ -166,7 +177,8 @@ public class ConfigReader
 	private void setSetting(String value1, String value2)
 	{
 		if (value1 == null || value1.isEmpty())
-			throw new IllformedConfigFileException("No setting given in line " + lineCounter);
+			throw new IllformedConfigFileException(
+					"No setting given in line " + lineCounter + " in " + getFileName());
 
 		switch (value1)
 		{
@@ -176,13 +188,15 @@ public class ConfigReader
 			case "inputSplitChar":
 				if (value2.length() > 1)
 					throw new IllformedConfigFileException(
-							value1 + " value is too long; can only have 1 character. In line " + lineCounter);
+							value1 + " value is too long; can only have 1 character. In line " + lineCounter + " in "
+									+ getFileName());
 				getInputFileParams().splitChar = value2.charAt(0);
 				break;
 			case "inputEscapeChar":
 				if (value2.length() > 1)
 					throw new IllformedConfigFileException(
-							value1 + " value is too long; can only have 1 character. In line " + lineCounter);
+							value1 + " value is too long; can only have 1 character. In line " + lineCounter + " in "
+									+ getFileName());
 				getInputFileParams().escapeChar = value2.charAt(0);
 				break;
 
@@ -192,18 +206,21 @@ public class ConfigReader
 			case "ouputSplitChar":
 				if (value2.length() > 1)
 					throw new IllformedConfigFileException(
-							value1 + " value is too long; can only have 1 character. In line " + lineCounter);
+							value1 + " value is too long; can only have 1 character. In line " + lineCounter + " in "
+									+ getFileName());
 				getOutputFileParams().splitChar = value2.charAt(0);
 				break;
 			case "outputEscapeChar":
 				if (value2.length() > 1)
 					throw new IllformedConfigFileException(
-							value1 + " value is too long; can only have 1 character. In line " + lineCounter);
+							value1 + " value is too long; can only have 1 character. In line " + lineCounter + " in "
+									+ getFileName());
 				getOutputFileParams().escapeChar = value2.charAt(0);
 				break;
 
 			default:
-				throw new IllformedConfigFileException("Unknown Setting '" + value1 + "' in line " + lineCounter + ".");
+				throw new IllformedConfigFileException("Unknown Setting '" + value1 + "' in line " + lineCounter
+						+ " in file " + getFileName());
 		}
 	}
 
