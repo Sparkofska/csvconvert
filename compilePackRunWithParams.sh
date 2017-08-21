@@ -20,4 +20,4 @@ jar cfe csvconverter.jar main.java.Main main/java/**/*.class
 cd ..
 
 # execute the jar
-java -jar bin/csvconverter.jar
+java -jar bin/csvconverter.jar data/input.csv data/output.csv data/config.txt

@@ -11,12 +11,12 @@ import java.util.List;
 
 public abstract class PureCsvReader
 {
-	private String			delimiter		= ";";
-	private String			quoteCharacter	= "\"";
-	private BufferedReader	reader;
+	private CsvParams csvParams = CsvParams.getDefaultCsvParams();
+	private BufferedReader reader;
 
 	public PureCsvReader(File csvFile) throws IOException
 	{
+		// TODO get charset from csvParams
 		this(csvFile, "ISO8859_1");
 	}
 
@@ -54,7 +54,7 @@ public abstract class PureCsvReader
 		String headers;
 		if ((headers = reader.readLine()) == null)
 		{
-			throw new IllegalArgumentException("Die Datei ist leer.");
+			throw new IllformedCsvException("Empty file was given.");
 		}
 		else
 		{
@@ -70,133 +70,83 @@ public abstract class PureCsvReader
 		}
 	}
 
-	/**
-	 * Thanks to https://www.mkyong.com/java/how-to-read-and-parse-csv-file-in-java/
-	 * 
-	 * @param cvsLine
-	 * @return
-	 */
-	public List<String> parseLine(String cvsLine)
+	private int lineCounter = 0;
+
+	public List<String> parseLine(String line)
 	{
+		lineCounter++;
 
-		List<String> result = new ArrayList<>();
+		ArrayList<String> result = new ArrayList<>();
 
-		// if empty, return!
-		if (cvsLine == null || cvsLine.isEmpty())
-		{
+		// ignore empty lines
+		if (line == null)
 			return result;
-		}
+		line = line.trim();
+		if (line.isEmpty())
+			return result;
+
+		boolean inEscapeSequence = false;
+		int inEscapeSequenceCounter = 0;
 
 		StringBuffer curVal = new StringBuffer();
-		boolean inQuotes = false;
-		boolean startCollectChar = false;
-		boolean doubleQuotesInColumn = false;
-
-		char[] chars = cvsLine.toCharArray();
-
-		for (char ch : chars)
+		char[] chars = line.toCharArray();
+		for (int i = 0; i < chars.length; i++)
 		{
+			char ch = chars[i];
 
-			if (inQuotes)
+			if (inEscapeSequence)
 			{
-				startCollectChar = true;
-				if (ch == quoteCharacter.charAt(0))
+				if (ch == csvParams.escapeChar)
 				{
-					inQuotes = false;
-					doubleQuotesInColumn = false;
-				}
-				else
-				{
-
-					// Fixed : allow "" in custom quote enclosed
-					if (ch == '\"')
+					// allow escaped escape-char in escape-sequence
+					if (i < chars.length - 1 && chars[i + 1] == csvParams.escapeChar)
 					{
-						if (!doubleQuotesInColumn)
-						{
-							curVal.append(ch);
-							doubleQuotesInColumn = true;
-						}
-					}
-					else
-					{
+						i++;
 						curVal.append(ch);
+						continue;
 					}
+					if (inEscapeSequenceCounter == 0)
+						curVal.append(ch);
+					inEscapeSequence = false;
+					continue;
 				}
+				inEscapeSequenceCounter++;
+				curVal.append(ch);
 			}
 			else
 			{
-				if (ch == quoteCharacter.charAt(0))
+				if (ch == csvParams.escapeChar)
 				{
-
-					inQuotes = true;
-
-					// Fixed : allow "" in empty quote enclosed
-					if (chars[0] != '"' && quoteCharacter.charAt(0) == '\"')
-					{
-						curVal.append('"');
-					}
-
-					// double quotes in column will hit this!
-					if (startCollectChar)
-					{
-						curVal.append('"');
-					}
-
-				}
-				else if (ch == delimiter.charAt(0))
-				{
-
-					result.add(curVal.toString());
-
-					curVal = new StringBuffer();
-					startCollectChar = false;
-
-				}
-				else if (ch == '\r')
-				{
-					// ignore LF characters
+					inEscapeSequence = true;
+					inEscapeSequenceCounter = 0;
 					continue;
 				}
-				else if (ch == '\n')
-				{
-					// the end, break!
-					break;
-				}
-				else
-				{
-					curVal.append(ch);
-				}
-			}
 
+				if (ch == csvParams.splitChar)
+				{
+					result.add(curVal.toString());
+					curVal = new StringBuffer();
+					continue;
+				}
+				curVal.append(ch);
+			}
 		}
 
-		result.add(curVal.toString());
+		if (inEscapeSequence)
+			throw new IllformedConfigFileException(
+					"Improper number of '" + csvParams.escapeChar + "'s in line " + lineCounter);
 
 		return result;
 	}
 
-	public String getDelimiter()
+	public CsvParams getCsvParams()
 	{
-		return delimiter;
+		return csvParams;
 	}
 
-	/**
-	 * changes the delimiter, which is used for separation of two values.<br>
-	 * default value is <code>";"</code>
-	 */
-	public void setDelimiter(String delimiter)
+	public void setCsvParams(CsvParams csvParams)
 	{
-		this.delimiter = delimiter;
-	}
-
-	public String getQuoteCharacter()
-	{
-		return quoteCharacter;
-	}
-
-	public void setQuoteCharacter(String quoteCharacter)
-	{
-		this.quoteCharacter = quoteCharacter;
+		this.csvParams = csvParams;
 	}
 
 }

@@ -9,13 +9,19 @@ import java.io.Reader;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * 
+ * @author jonas
+ *
+ * @param <T>
+ */
 public abstract class BeanCsvReader<T>
 {
-	private PureCsvReader	base;
+	private PureCsvReader base;
 
-	private ArrayList<T>	beans;
+	private ArrayList<T> beans;
 
-	private boolean			stateAlreadyRead	= false;
+	private boolean stateAlreadyRead = false;
 
 	public BeanCsvReader(File csvFile) throws IOException
 	{
@@ -64,7 +70,7 @@ public abstract class BeanCsvReader<T>
 		};
 	}
 
-	private ArrayList<T> getBeanList()
+	protected ArrayList<T> getBeanList()
 	{
 		if (beans == null)
 			beans = new ArrayList<>();
@@ -73,17 +79,13 @@ public abstract class BeanCsvReader<T>
 
 	protected abstract T toBean(int index, List<String> list);
 
-	/**
-	 * changes the delimiter, which is used for separation of two values.<br>
-	 * default value is <code>";"</code>
-	 */
-	public void setDelimiter(String delimiter)
+	public void setCsvParams(CsvParams p)
 	{
-		base.setDelimiter(delimiter);
+		base.setCsvParams(p);
 	}
 
-	public void setQuoteCharacter(String quoteCharacter)
+	public CsvParams getCsvParams()
 	{
-		base.setQuoteCharacter(quoteCharacter);
+		return base.getCsvParams();
 	}
 }
