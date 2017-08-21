@@ -1,4 +1,4 @@
-# csvconvert
+# csvtransform
 
 This program 'csvtransform' transforms a given csv file to another by userdefined rules. The rules are defined in a configuration file and can specify actions for columns like rename, re-ordering, delete and add.
 
@@ -28,3 +28,5 @@ For adding new columns in the outputFile leave the originColumn field blank. A d
 ```
 
 If you want the '>' sign in a column header, you can escape it with ". The " character can be escapes by doubling it.
+
+In the folder *data/* examples of the input.csv and config.txt files can be found.
