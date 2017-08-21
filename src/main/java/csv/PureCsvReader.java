@@ -144,6 +144,8 @@ public abstract class PureCsvReader
 			throw new IllformedConfigFileException("Improper number of '" + csvParams.escapeChar + "'s in line "
 					+ lineCounter + " in " + getFileName());
 
+		result.add(curVal.toString());
+		
 		return result;
 	}
 

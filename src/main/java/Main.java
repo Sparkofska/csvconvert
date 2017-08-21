@@ -40,7 +40,7 @@ public class Main
 			// catch any Exception and present it to user in a proper way
 			String exName = e.getClass().getName();
 			System.out.println(exName + ": " + e.getMessage());
-			// e.printStackTrace();
+			 e.printStackTrace();
 		}
 	}
 

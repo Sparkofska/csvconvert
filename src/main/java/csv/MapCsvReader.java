@@ -10,15 +10,18 @@ import java.util.Map;
 public class MapCsvReader extends BeanCsvReader<Map<String, Object>>
 {
 	private List<String> headers;
+	private File file;
 
 	public MapCsvReader(File csvFile) throws IOException
 	{
 		super(csvFile);
+		this.file = csvFile;
 	}
 
 	public MapCsvReader(File csvFile, CsvParams csvParams) throws IOException
 	{
 		super(csvFile, csvParams);
+		this.file = csvFile;
 	}
 
 	@Override
@@ -26,8 +29,10 @@ public class MapCsvReader extends BeanCsvReader<Map<String, Object>>
 	{
 		if (list.size() != headers.size())
 		{
-			throw new IllformedCsvException("Line " + index + " has " + list.size() + " columns, but header has "
-					+ headers.size() + " columns in " + base.getFileName());
+			System.out.println("headers: " + headers);
+			System.out.println("line " + (index + 1) + ": " + list);
+			throw new IllformedCsvException("Line " + (index + 1) + " has " + list.size() + " columns, but header has "
+					+ headers.size() + " columns in " + file.getAbsolutePath());
 		}
 
 		Map<String, Object> map = new HashMap<String, Object>(list.size());

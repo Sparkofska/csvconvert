@@ -1,0 +1,15 @@
+# A line starting with # is a comma and will be ignored
+
+# for more information on encoding see https://docs.oracle.com/javase/8/docs/api/java/nio/charset/Charset.html
+inputEncoding=utf8
+inputSplitChar=;
+inputEscapeChar='
+
+outputEncoding=utf8
+ouputSplitChar=,
+outputEscapeChar=""
+
+number>Number
+Name>Person
+Adress>Adress
+>newColumn:defaultValue
