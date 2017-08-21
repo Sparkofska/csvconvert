@@ -75,7 +75,7 @@ public class Main
 						+ "input.csv  :\n A csv file containing all the data that should be transformed. This file will remain the same after execution. \n"
 						+ "output.csv :\n This file (is created if not exists) will be overwritten by the program. All the transformed data will be placed here after execution. \n"
 						+ "config.txt :\n A file with a special syntax that defines all the transformation rules. \n\n"
-						+ "For further information and config.txt-syntax see https://github.com/Sparkofska/csvconvert");
+						+ "For further information and config.txt-syntax see https://github.com/Sparkofska/csvtransform");
 
 		System.out.println("");
 	}
