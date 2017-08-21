@@ -6,6 +6,7 @@ import java.util.Map;
 
 import main.java.csv.CsvParams;
 import main.java.csv.MapCsvReader;
+import main.java.csv.TransformCsvWriter;
 
 public class Main
 {
@@ -22,18 +23,24 @@ public class Main
 			CsvParams inputFileParams = configreader.getInputFileParams();
 			CsvParams ouputFileParams = configreader.getOutputFileParams();
 			List<Rule> rules = configreader.getRules();
-			
-			/*debugPrintRules(rules);
-			debugPrint(inputFileParams, "inputFileParams");
-			debugPrint(ouputFileParams, "outputFileParams");*/
+
+			/*
+			 * debugPrintRules(rules); debugPrint(inputFileParams,
+			 * "inputFileParams"); debugPrint(ouputFileParams,
+			 * "outputFileParams");
+			 */
 
 			// read input file into beans
 			MapCsvReader csvreader = new MapCsvReader(new File(arguments.pathInputFile));
 			csvreader.setCsvParams(inputFileParams);
 			List<Map<String, Object>> inputCsvData = csvreader.getBeans();
-			debugPrint(inputCsvData);
+//			debugPrint(inputCsvData);
 
-			// TODO write beans to outputfile
+			// write beans to outputfile
+			TransformCsvWriter writer = new TransformCsvWriter(new File(arguments.pathOutputFile), rules,
+					ouputFileParams);
+			writer.emit(inputCsvData);
+			writer.close();
 
 			System.out.println("terminated successfully.");
 		}

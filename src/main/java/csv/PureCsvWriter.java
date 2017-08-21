@@ -10,20 +10,25 @@ import java.io.Writer;
  */
 public class PureCsvWriter
 {
-	private String	newline			= "\r\n";
-	private String	delimiter		= ";";
-	private String	quoteCharacter	= "\"";
+	private CsvParams csvParams = CsvParams.getDefaultCsvParams();
 
-	private Writer	out;
-	private boolean	lastWasNewLine	= true;
+	private Writer out;
+	private boolean lastWasNewLine = true;
 
 	/**
 	 * 
-	 * @param out Defines where to ouput the csv content.
+	 * @param out
+	 *            Defines where to ouput the csv content.
 	 */
 	public PureCsvWriter(Writer out)
 	{
 		this.out = out;
+	}
+
+	public PureCsvWriter(Writer out, CsvParams csvParams)
+	{
+		this.out = out;
+		setCsvParams(csvParams);
 	}
 
 	public void emitCell(String content) throws IOException
@@ -45,15 +50,16 @@ public class PureCsvWriter
 	{
 		content = content.trim();
 		// escaping the quoteCharacter by doubling it
-		content = content.replace(quoteCharacter, quoteCharacter + quoteCharacter);
+		content = content.replace(String.valueOf(csvParams.escapeChar),
+				String.valueOf(csvParams.escapeChar) + String.valueOf(csvParams.escapeChar));
 
 		// quoting the content if it contains delimiter
-		if (content.contains(delimiter))
-			content = quoteCharacter + content + quoteCharacter;
+		if (content.contains(String.valueOf(csvParams.splitChar)))
+			content = csvParams.escapeChar + content + csvParams.escapeChar;
 
 		// write delimiter if necessary
 		if (!lastWasNewLine)
-			out.write(delimiter);
+			out.write(csvParams.splitChar);
 
 		lastWasNewLine = false;
 		out.write(content);
@@ -61,7 +67,7 @@ public class PureCsvWriter
 
 	public void emitNewline() throws IOException
 	{
-		out.write(newline);
+		out.write(csvParams.newline);
 		lastWasNewLine = true;
 	}
 
@@ -70,37 +76,14 @@ public class PureCsvWriter
 		out.flush();
 	}
 
-	public String getDelimiter()
+	public CsvParams getCsvParams()
 	{
-		return delimiter;
+		return csvParams;
 	}
 
-	/**
-	 * changes the delimiter, which is used for separation of two values.<br>
-	 * default value is <code>";"</code>
-	 */
-	public void setDelimiter(String delimiter)
+	public void setCsvParams(CsvParams csvParams)
 	{
-		this.delimiter = delimiter;
+		this.csvParams = csvParams;
 	}
 
-	public String getQuoteCharacter()
-	{
-		return quoteCharacter;
-	}
-
-	public void setQuoteCharacter(String quoteCharacter)
-	{
-		this.quoteCharacter = quoteCharacter;
-	}
-
-	public String getNewLine()
-	{
-		return this.newline;
-	}
-
-	public void setNewLine(String newline)
-	{
-		this.newline = newline;
-	}
 }
