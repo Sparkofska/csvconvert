@@ -70,7 +70,7 @@ public class Main
 		System.out.println("This is the help text");
 		System.out.println("---------------------");
 		System.out.println("");
-		System.out.println("Call this programm like:\n\n" + "java -jar csvtool.jar input.csv output.csv config.txt\n\n"
+		System.out.println("Call this programm like:\n\n" + "java -jar csvtransform.jar input.csv output.csv config.txt\n\n"
 				+ "input.csv  :\n A csv file containing all the data that should be transformed. This file will remain the same after execution. \n"
 				+ "output.csv :\n This file (is created if not exists) will be overwritten by the program. All the transformed data will be placed here after execution. \n"
 				+ "config.txt :\n A file with a special syntax that defines all the transformation rules. \n\n"
